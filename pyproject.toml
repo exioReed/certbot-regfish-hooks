@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+version_file = "certbot_regfish_hooks/__version__.py"
+
+[project]
+name = "certbot-regfish-hooks"
+description = "regfish pre and post validation hooks for certbot"
+
+authors = [{ name = "Maximilian Kaulmann", email = "exioreed@ownlink.eu" }]
+
+# see: https://packaging.python.org/en/latest/guides/single-sourcing-package-version/#single-sourcing-the-version
+dynamic = ["version"]
+
+requires-python = ">=3.10"
+# NOTE: ~=10.4 <==> >=10.4,<11
+dependencies = ["pydantic~=2.9.2", "requests~=2.32.3"]
+
+license = { file = "LICENSE" }
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Plugins",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Internet :: Name Service (DNS)",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Security",
+]
+
+[project.urls]
+
+# homepage = ""
+source = "https://github.com/exioReed/certbot-regfish-hooks"
+# documentation = ""
+
+[project.scripts]
+certbot-regfish-hooks = "certbot_regfish_hooks.cli:main"
+certbot-regfish-auth-hook = "certbot_regfish_hooks.cli:auth_hook"
+certbot-regfish-cleanup-hook = "certbot_regfish_hooks.cli:cleanup_hook"
