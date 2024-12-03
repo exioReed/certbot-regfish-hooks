@@ -92,13 +92,15 @@ consider this ready for production:
 
 ### If that's version 2, where's version 1?
 
-This project started six years ago as the very first Python module one of my closest
-friends hacked together for educational purposes. Cerbot wasn't able to handle DNS
-challenges back then, so he came up with a hand-rolled ACME implementation and screen
-scraping interface for Regfish. This tool, which has requested over 50 certificates for
-our purposes by now, is what we named _autocrt-dns_.
+In fact, this project started six years ago as the very first Python module one of my
+closest friends hacked together for educational purposes. Certbot wasn't able to handle
+DNS challenges back then, so he came up with a hand-rolled ACME implementation and
+screen scraping interface for Regfish. This tool, which has requested over 50
+certificates for our purposes by now, is what we named _autocrt-dns_.
 
-It was rock-solid until the day Regfish changed their DNS pad for the better and
-_finally_ added an API to their product. This public repository is a complete rewrite of
-our first version. None of the initial code survived, but it still identifies itself
-with the user-agent autocrt, now in version 2, for sentimental reasons.
+It's been rock-solid until the day Regfish changed their DNS pad for the better and
+_finally_ added an API to their product in November 2024. This public repository is a
+complete rewrite of our first version, leaning towards Certbot's now well-established
+ACME implementation and focusing on DNS authorization. None of the initial code survived
+but for sentimental reasons, it still identifies itself with the user-agent _autocrt_,
+now in version 2.
