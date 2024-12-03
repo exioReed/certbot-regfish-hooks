@@ -58,9 +58,6 @@ def regfish_auth_hook(args: argparse.Namespace):
     -----
     The function prints the record ID (rrid) to stdout, which will be
     captured by Certbot and passed to the cleanup hook via CERTBOT_AUTH_OUTPUT.
-
-    If this is the last challenge (certbot_remaining_challenges == 0),
-    the function sleeps for TTL + 30 seconds to ensure DNS propagation.
     """
     client = RegfishClient(api_key=args.regfish_api_key)
     rr = client.create_record(
