@@ -85,10 +85,10 @@ The auth hooks have been tested as described above and this project will be depl
 across two servers shortly. Let's be honest though - a bit homework remains before I'd
 consider this ready for production:
 
-- Pre-commit hooks for linting/formatting
-- Automated dependency upgrades (Dependabot)
-- Integration testing with a test domain
-- Automated builds and releases to PyPI
+- [ ] Automated dependency upgrades (Dependabot)
+- [ ] Integration testing with a test domain
+- [ ] Automated builds and releases to PyPI
+- [x] Pre-commit hooks for linting/formatting
 
 ### If that's version 2, where's version 1?
 

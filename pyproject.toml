@@ -33,6 +33,9 @@ classifiers = [
     "Topic :: Security",
 ]
 
+[project.optional-dependencies]
+dev = ["pre-commit~=4.0"]
+
 [project.urls]
 
 # homepage = ""
