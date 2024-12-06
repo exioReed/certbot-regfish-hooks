@@ -94,9 +94,9 @@ consider this ready for production:
 
 In fact, this project started six years ago as the very first Python module one of my
 closest friends hacked together for educational purposes. Certbot wasn't able to handle
-DNS challenges back then, so he came up with a hand-rolled ACME implementation and
-screen scraping interface for Regfish. This tool, which has requested over 50
-certificates for our purposes by now, is what we named _autocrt-dns_.
+DNS challenges back then, so he came up with a hand-rolled ACME implementation and web
+scraping interface for Regfish. This tool, which has requested over 50 certificates for
+our purposes by now, is what we named _autocrt-dns_.
 
 It's been rock-solid until the day Regfish changed their DNS pad for the better and
 _finally_ added an API to their product in November 2024. This public repository is a
