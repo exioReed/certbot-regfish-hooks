@@ -60,6 +60,10 @@ jobs:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
+      - name: "Install jq"
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install jq
       - name: "Setup env for current ${{ github.job }} job"
         env:
           BUILD_JOBS_OUTPUT_JSON: "${{ needs.build.outputs.jobs }}"
