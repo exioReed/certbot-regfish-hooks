@@ -30,26 +30,26 @@ jobs:
 
       - name: "Setup env for current ${{ github.job }} job"
         run: |
-          echo "JOB_PREFIX=py$(echo "${{ matrix.python-version }}" | sed 's/\.//g')" >> "$GITHUB_ENV"
-          echo "JOB_PKG_VERSION=$(python -m setuptools_scm)" >> "$GITHUB_ENV"
+          echo "CFG_PREFIX=py$(echo "${{ matrix.python-version }}" | sed 's/\.//g')" >> "$GITHUB_ENV"
+          echo "CFG_PKG_VERSION=$(python -m setuptools_scm)" >> "$GITHUB_ENV"
 
-      - name: "Build package ${{ github.repository }} version ${{ env.JOB_PKG_VERSION }}"
+      - name: "Build package ${{ github.repository }} version ${{ env.CFG_PKG_VERSION }}"
         run: "python -m build ."
 
       - name: "Upload artifact"
         id: "upload-dist"
         uses: "actions/upload-artifact@v4"
         with:
-          name: "${{ env.JOB_PREFIX }}"
+          name: "${{ env.CFG_PREFIX }}"
           path: "dist/"
           retention-days: 1
 
       - name: "Generate output"
         id: "gen-output"
         run: |
-          echo "${JOB_PREFIX}-build-version=${JOB_PKG_VERSION}" >> "$GITHUB_OUTPUT"
-          echo "${JOB_PREFIX}-upload-dist-status=${{ steps.upload-dist.outputs.status }}" >> "$GITHUB_OUTPUT"
-          echo "${JOB_PREFIX}-artifact-id=${{ steps.upload-dist.outputs.artifact-id }}" >> "$GITHUB_OUTPUT"
+          echo "${CFG_PREFIX}-build-version=${CFG_PKG_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "${CFG_PREFIX}-upload-dist-status=${{ steps.upload-dist.outputs.status }}" >> "$GITHUB_OUTPUT"
+          echo "${CFG_PREFIX}-artifact-id=${{ steps.upload-dist.outputs.artifact-id }}" >> "$GITHUB_OUTPUT"
     outputs:
       jobs: "${{ toJSON(steps.gen-output.outputs) }}"
 
@@ -63,19 +63,19 @@ jobs:
       - name: "Setup env for current ${{ github.job }} job"
         env:
           BUILD_JOBS_OUTPUT_JSON: "${{ needs.build.outputs.jobs }}"
-          JOB_PYTHON_VERSION: "${{ matrix.python-version }}"
+          CFG_PYTHON_VERSION: "${{ matrix.python-version }}"
         run: |
-          JOB_PREFIX="py$(echo "${JOB_PYTHON_VERSION}" | sed 's/\.//g')"
-          JOB_PKG_VERSION="$(jq -r ".[\"$JOB_PREFIX-build-version\"]" <<<"${BUILD_JOBS_OUTPUT_JSON}")"
-          JOB_DOMAIN_NAME="cbrghks-$JOB_PREFIX-v$(echo "$JOB_PKG_VERSION" | sed 's/[^a-zA-Z0-9]/-/g')-$GITHUB_RUN_ID"
-          echo "JOB_PREFIX=$JOB_PREFIX" >>"$GITHUB_ENV"
-          echo "JOB_PKG_VERSION=$JOB_PKG_VERSION" >>"$GITHUB_ENV"
-          echo "JOB_DOMAIN_NAME=$JOB_DOMAIN_NAME" >>"$GITHUB_ENV"
+          CFG_PREFIX="py$(echo "${CFG_PYTHON_VERSION}" | sed 's/\.//g')"
+          CFG_PKG_VERSION="$(jq -r ".[\"$CFG_PREFIX-build-version\"]" <<<"${BUILD_JOBS_OUTPUT_JSON}")"
+          CFG_DOMAIN_NAME="cbrghks-$CFG_PREFIX-v$(echo "$CFG_PKG_VERSION" | sed 's/[^a-zA-Z0-9]/-/g')-$GITHUB_RUN_ID"
+          echo "CFG_PREFIX=$CFG_PREFIX" >>"$GITHUB_ENV"
+          echo "CFG_PKG_VERSION=$CFG_PKG_VERSION" >>"$GITHUB_ENV"
+          echo "CFG_DOMAIN_NAME=$CFG_DOMAIN_NAME" >>"$GITHUB_ENV"
 
       - name: "Fetch distributables for Python ${{ matrix.python-version }}"
         uses: "actions/download-artifact@v4"
         with:
-          name: "${{ env.JOB_PREFIX }}"
+          name: "${{ env.CFG_PREFIX }}"
           path: "dist/"
 
       - name: "Setup Python ${{ matrix.python-version }}"
@@ -112,7 +112,7 @@ jobs:
 
       - name: "Request certificate"
         env:
-          INTEGRATION_TEST_FULL_DOMAIN: "${{ env.JOB_DOMAIN_NAME }}.${{ vars.TEST_BASE_DOMAIN}}"
+          INTEGRATION_TEST_FULL_DOMAIN: "${{ env.CFG_DOMAIN_NAME }}.${{ vars.TEST_BASE_DOMAIN}}"
         run: |
           certbot \
             certonly \
