@@ -15,7 +15,7 @@ authors = [{ name = "Maximilian Kaulmann", email = "exioreed@ownlink.eu" }]
 # see: https://packaging.python.org/en/latest/guides/single-sourcing-package-version/#single-sourcing-the-version
 dynamic = ["version"]
 
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 # NOTE: ~=10.4 <==> >=10.4,<11
 dependencies = ["pydantic>=2.9.2,<2.11.0", "requests~=2.32.3"]
 
