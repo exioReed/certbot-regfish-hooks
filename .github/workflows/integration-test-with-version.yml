@@ -1,0 +1,28 @@
+name: "Integration Test with Python Version"
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        description: "Python version to use to build package. Supports SemVer as described in actions/setup-python." # https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#using-the-python-version-input
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      python-version:
+        description: "Python version to use to build package. Supports SemVer as described in actions/setup-python." # https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#using-the-python-version-input
+        required: false
+        default: "3.13"
+        type: string
+
+jobs:
+  build:
+    uses: "./.github/workflows/build-package.yml"
+    with:
+      python-version: "${{ inputs.python-version }}"
+  req-test-cert:
+    needs: ["build"]
+    uses: "./.github/workflows/request-test-certificate.yml"
+    with:
+      artifact-name: "${{ needs.build.outputs.artifact-name }}"
+      python-version: "${{ inputs.python-version }}"
+    secrets: inherit

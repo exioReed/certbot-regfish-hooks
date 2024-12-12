@@ -1,0 +1,50 @@
+name: "Build Package"
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        description: "Python version to use to build package. Supports SemVer as described in actions/setup-python." # https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#using-the-python-version-input
+        required: true
+        type: string
+    outputs:
+      artifact-name:
+        description: "Artifact Name"
+        value: "${{ jobs.build-package.outputs.artifact-name }}"
+
+jobs:
+  build-package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: "actions/checkout@v4"
+        with:
+          fetch-depth: 0
+
+      - name: "Setup Python ${{ inputs.python-version }}"
+        uses: "actions/setup-python@v5"
+        with:
+          python-version: "${{ inputs.python-version }}"
+
+      - name: "Upgrade build dependencies"
+        run: "pip install -U pip build setuptools_scm>=8"
+
+      - name: "Build package ${{ github.repository }}"
+        run: "python -m build ."
+
+      - name: "Setup artifact"
+        id: artifact
+        env:
+          PYTHON_VERSION: "${{ inputs.python-version }}"
+        run: |
+          PACKAGE_VERSION="$(python -m setuptools_scm)"
+          echo name="certbot-regfish-hooks-py${PYTHON_VERSION}-v${PACKAGE_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: "Upload artifact"
+        id: "upload-dist"
+        uses: "actions/upload-artifact@v4"
+        with:
+          name: "${{ steps.artifact.outputs.name }}"
+          path: "dist/"
+          retention-days: 1
+    outputs:
+      artifact-name: "${{ steps.artifact.outputs.name }}"

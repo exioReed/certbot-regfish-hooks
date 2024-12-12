@@ -1,0 +1,87 @@
+name: "Request Test Certificate"
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        description: "Python version to use to build package. Supports SemVer as described in actions/setup-python." # https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#using-the-python-version-input
+        required: true
+        type: string
+      artifact-name:
+        description: "The artifact name of a build artifact to use for integration testing."
+        required: true
+        type: string
+    outputs:
+      test-domain-name:
+        value: "${{ jobs.req-test-certificate.outputs.test-domain-name }}"
+
+jobs:
+  req-test-certificate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Fetch distributables for Python ${{ inputs.python-version }}"
+        uses: "actions/download-artifact@v4"
+        with:
+          name: "${{ inputs.artifact-name }}"
+          path: "dist/"
+
+      - name: "Setup Python ${{ inputs.python-version }}"
+        uses: "actions/setup-python@v5"
+        with:
+          python-version: "${{ inputs.python-version }}"
+
+      - name: "Install certbot"
+        run: "pip install certbot"
+
+      - name: "Install regfish hooks"
+        run: "pip install dist/*.whl"
+
+      - name: "Prepare certbot environment"
+        id: certbot-env
+        env:
+          TEST_DOMAIN_BASE: ${{ vars.TEST_DOMAIN_BASE }}
+          CERTBOT_TEST_ACCOUNT: "${{ secrets.CERTBOT_TEST_ACCOUNT }}"
+          REGFISH_API_KEY: "${{ secrets.REGFISH_API_KEY }}"
+          PYTHON_VERSION: "${{ inputs.python-version }}"
+        run: |
+          CERTBOT_BASE_DIR="$RUNNER_TEMP/integration-test"
+          echo "base-dir=$CERTBOT_BASE_DIR" >> "$GITHUB_OUTPUT"
+
+          CERTBOT_CONFIG_DIR="$CERTBOT_BASE_DIR/config"
+          echo "config-dir=$CERTBOT_CONFIG_DIR" >> "$GITHUB_OUTPUT"
+          mkdir -p "$CERTBOT_CONFIG_DIR"
+          tar -C "$CERTBOT_CONFIG_DIR" -xzf <(echo "$CERTBOT_TEST_ACCOUNT" | base64 -d)
+
+          CERTBOT_LOG_DIR="$CERTBOT_BASE_DIR/log"
+          echo "log-dir=$CERTBOT_LOG_DIR" >> "$GITHUB_OUTPUT"
+          mkdir -p "$CERTBOT_LOG_DIR"
+
+          REGFISH_API_KEY_FILE="$CERTBOT_BASE_DIR/regfish-api-key"
+          echo "regfish-api-key-file=$REGFISH_API_KEY_FILE" >> "$GITHUB_OUTPUT"
+          cat <(echo "$REGFISH_API_KEY") > "$REGFISH_API_KEY_FILE"
+
+          TEST_DOMAIN_PREFIX="cbrghks-py${PYTHON_VERSION//./}-v$(certbot-regfish-hooks --version | sed 's/[^a-zA-Z0-9]/-/g')-$GITHUB_RUN_ID-$GITHUB_RUN_NUMBER"
+          echo "test-domain-name=$TEST_DOMAIN_PREFIX.$TEST_DOMAIN_BASE" >> "$GITHUB_OUTPUT"
+
+      - name: "Request certificate"
+        env:
+          CERTBOT_BASE_DIR: "${{ steps.certbot-env.outputs.base-dir }}"
+          CERTBOT_CONFIG_DIR: "${{ steps.certbot-env.outputs.config-dir }}"
+          CERTBOT_LOG_DIR: "${{ steps.certbot-env.outputs.log-dir }}"
+          REGFISH_API_KEY_FILE: "${{ steps.certbot-env.outputs.regfish-api-key-file }}"
+          TEST_DOMAIN_NAME: "${{ steps.certbot-env.outputs.test-domain-name }}"
+        run: |
+          certbot \
+            certonly \
+            --manual \
+            --test-cert \
+            --manual-auth-hook "certbot-regfish-auth-hook --regfish-api-key-file $REGFISH_API_KEY_FILE" \
+            --manual-cleanup-hook "certbot-regfish-cleanup-hook --regfish-api-key-file $REGFISH_API_KEY_FILE" \
+            --preferred-challenges dns-01 \
+            --key-type ecdsa \
+            --elliptic-curve secp384r1 \
+            --domain "$TEST_DOMAIN_NAME" \
+            --config-dir "$CERTBOT_CONFIG_DIR" \
+            --work-dir "$CERTBOT_BASE_DIR" \
+            --logs-dir "$CERTBOT_LOG_DIR"
+    outputs:
+      test-domain-name: "${{ steps.certbot-env.outputs.test-domain-name }}"
