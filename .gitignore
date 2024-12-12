@@ -1,5 +1,5 @@
 # Project
-certbot_regfish_hooks/__version__.py
+src/certbot_regfish_hooks/__version__.py
 
 # OS specific
 .DS_Store
