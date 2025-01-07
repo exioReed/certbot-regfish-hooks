@@ -1,5 +1,7 @@
 # Certbot Regfish DNS Hooks
 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/exioReed/certbot-regfish-hooks/integration-test.yml?branch=main&label=integration-test&link=https%3A%2F%2Fgithub.com%2FexioReed%2Fcertbot-regfish-hooks%2Factions%2Fworkflows%2Fintegration-test.yml)
+
 **Overview:**
 
 - [Installation](#installation)
@@ -85,8 +87,8 @@ The auth hooks have been tested as described above and this project will be depl
 across two servers shortly. Let's be honest though - a bit homework remains before I'd
 consider this ready for production:
 
-- [ ] Integration testing with a test domain
 - [ ] Automated builds and releases to PyPI
+- [x] [Integration testing](/.github/workflows/README.md#integration-test)
 - [x] Pre-commit hooks for linting/formatting
 - [x] Automated dependency upgrades (Dependabot)
 
