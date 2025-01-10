@@ -1,0 +1,43 @@
+name: "Pre-Commit Hooks"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pre-commit-hooks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: "actions/checkout@v4"
+        with:
+          fetch-depth: 0
+
+      - name: "Setup Python 3.13"
+        uses: "actions/setup-python@v5"
+        with:
+          python-version: "3.13"
+
+      - name: "Install development dependencies"
+        run: "pip install .[dev]"
+
+      - name: "Install pre-commit hooks"
+        run: "pre-commit install --install-hooks"
+
+      - name: "Run pre-commit hooks"
+        id: pre-commit
+        run: "pre-commit run --color never --all-files > pre-commit-stdout"
+
+      - name: "Summarize pre-commit hooks on failure"
+        if: failure()
+        run: |
+          printf '### Pre-commit hooks\n\n```\n' > $GITHUB_STEP_SUMMARY
+          cat pre-commit-stdout >> $GITHUB_STEP_SUMMARY
+          printf '```\n\n### Applied fixes\n\n```diff\n' >> $GITHUB_STEP_SUMMARY
+          git diff >> $GITHUB_STEP_SUMMARY
+          printf '```\n' >> $GITHUB_STEP_SUMMARY
+          cat $GITHUB_STEP_SUMMARY
