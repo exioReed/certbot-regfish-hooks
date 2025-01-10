@@ -5,6 +5,7 @@ GitHub Actions workflows for the `certbot-regfish-hooks` repository.
 Primary workflow(s):
 
 - [`integration-test.yml`](/.github/workflows/integration-test.yml)
+- [`pre-commit-hooks.yml`](/.github/workflows/pre-commit-hooks.yml)
 - _(more to come)_
 
 ## Integration Test
@@ -37,3 +38,11 @@ Hence, it's not optimal to run the integration test workflow on every commit. Cu
 it executes on push and merge events to the `main` branch. While this isn't problematic
 due to low commit frequency, the workflow should be triggered more selectively (e.g.,
 only on release tags) to respect Let's Encrypt's staging environment guidelines.
+
+## Pre-Commit Hooks
+
+But why? Max, it's called _pre-commit_ for a reason.
+
+Yeah, about that... Too often I've encountered code that didn't pass all hooks after
+checkout. Running _pre-commit_ hooks in CI helps catch these issues early and ensures
+consistent code across all contributions.
