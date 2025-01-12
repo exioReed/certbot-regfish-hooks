@@ -6,6 +6,7 @@ Primary workflow(s):
 
 - [`integration-test.yml`](/.github/workflows/integration-test.yml)
 - [`pre-commit-hooks.yml`](/.github/workflows/pre-commit-hooks.yml)
+- [`release-please.yml`](/.github/workflows/release-please.yml)
 - _(more to come)_
 
 ## Integration Test
