@@ -28,6 +28,7 @@ jobs:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
       - id: get-build-artifact
         name: "Get build artifact"
+        if: ${{ steps.release.outputs.release_created }}
         uses: actions/download-artifact@v4
         with:
           name: ${{ needs.build.outputs.artifact-name }}
