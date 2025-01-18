@@ -1,17 +1,26 @@
 name: "Integration Test"
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  workflow_call:
+    inputs:
+      artifact-name:
+        description: "The artifact name of a build artifact to use for integration testing."
+        required: true
+        type: string
+      python-version:
+        description: "Python version to use to build package. Supports SemVer as described in actions/setup-python." # https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#using-the-python-version-input
+        required: true
+        type: string
+
 jobs:
-  integration-test:
-    uses: "./.github/workflows/integration-test-with-version.yml"
-    with:
-      python-version: "${{ matrix.python-version }}"
-    secrets: inherit
-    strategy:
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+  req-test-cert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Download build ${{ inputs.artifact-name }} to request test certificate"
+        uses: "actions/download-artifact@v4"
+        with:
+          name: "${{ inputs.artifact-name }}"
+      - uses: "./.github/workflows/request-test-certificate.yml"
+        with:
+          artifact-name: "${{ inputs.artifact-name }}"
+          python-version: "${{ inputs.python-version }}"
+          secrets: inherit

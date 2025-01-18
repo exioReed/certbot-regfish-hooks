@@ -1,45 +1,55 @@
+name: "Release Please"
+
 on:
   push:
     branches:
       - main
 
-permissions:
-  contents: write
-  pull-requests: write
-
-name: release-please
-
 jobs:
-  build:
-    uses: "./.github/workflows/build-package.yml"
-    with:
-      python-version: "3.13"
   release-please:
-    needs: ["build"]
-    runs-on: ubuntu-latest
     permissions:
-      id-token:
-        write # NOTE: Required for gh-action-pypi-publish, see
-        # https://github.com/pypa/gh-action-pypi-publish/tree/release/v1?tab=readme-ov-file#:~:text=job%20with%20the-,id%2Dtoken%3A%20write,-permission%20and%20without
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      sha: ${{ steps.release.outputs.sha }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      major: ${{ steps.release.outputs.major }}
+      minor: ${{ steps.release.outputs.minor }}
+      patch: ${{ steps.release.outputs.patch }}
     steps:
       - id: release
         uses: googleapis/release-please-action@v4
         with:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
-      - id: get-build-artifact
-        name: "Get build artifact"
-        if: ${{ steps.release.outputs.release_created }}
+
+  build-and-publish:
+    name: "Build and publish v${{ needs.release-please.outputs.major }}.${{ needs.release-please.outputs.minor }}.${{ needs.release-please.outputs.patch }}"
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: "Run pre-commit hooks"
+        id: pre-commit-hooks
+        uses: "./.github/workflows/pre-commit-hooks.yml"
+        with:
+          ref: ${{ needs.release-please.outputs.sha }}
+      - name: "Build package"
+        id: build
+        uses: "./.github/workflows/build-package.yml"
+        with:
+          ref: ${{ needs.release-please.outputs.sha }}
+      - name: "Download build artifact"
         uses: actions/download-artifact@v4
         with:
-          name: ${{ needs.build.outputs.artifact-name }}
+          name: ${{ steps.build.outputs.artifact-name }}
           path: "dist/"
-      - id: release-to-pypi
-        name: "Release to PyPI"
-        if: ${{ steps.release.outputs.release_created }}
+      - name: "Release to PyPI"
         uses: pypa/gh-action-pypi-publish@release/v1
-      - id: add-artifact-to-release
-        name: "Add artifact to release"
-        if: ${{ steps.release.outputs.release_created }}
+      - name: "Upload artifact to release"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ steps.release.outputs.tag_name }} ./dist/*
+        run: gh release upload ${{ needs.release-please.outputs.tag_name }} ./dist/*
