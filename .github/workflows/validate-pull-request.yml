@@ -20,4 +20,5 @@ jobs:
     uses: "./.github/workflows/integration-test.yml"
     with:
       artifact-name: "${{ needs.build-package.outputs.artifact-name }}"
+      python-version: "${{ needs.build-package.outputs.python-version }}"
     secrets: inherit
