@@ -7,6 +7,7 @@ on:
 
 jobs:
   release-please:
+    name: "Release please"
     permissions:
       contents: write
       pull-requests: write
@@ -25,7 +26,7 @@ jobs:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
 
   build-and-publish:
-    name: "Build and publish v${{ needs.release-please.outputs.major }}.${{ needs.release-please.outputs.minor }}.${{ needs.release-please.outputs.patch }}"
+    name: "Build and publish"
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created }}
     runs-on: ubuntu-latest

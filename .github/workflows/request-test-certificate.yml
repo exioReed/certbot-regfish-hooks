@@ -16,6 +16,7 @@ on:
 
 jobs:
   req-test-certificate:
+    name: "Request test certificate"
     runs-on: ubuntu-latest
     steps:
       - name: "Fetch distributables for Python ${{ inputs.python-version }}"

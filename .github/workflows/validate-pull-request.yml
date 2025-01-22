@@ -11,10 +11,13 @@ on:
 
 jobs:
   run-pre-commit-hooks:
+    name: "Pre-commit hooks"
     uses: "./.github/workflows/pre-commit-hooks.yml"
   build-package:
+    name: "Build package"
     uses: "./.github/workflows/build-package.yml"
   integration-test:
+    name: "Integration test"
     if: "${{ github.event.pull_request.labels.*.name == 'autorelease: pending' }}"
     needs: build-package
     uses: "./.github/workflows/integration-test.yml"
