@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/exioReed/certbot-regfish-hooks/compare/certbot-regfish-hooks-v2.0.0...certbot-regfish-hooks-v2.0.1) (2025-01-22)
+
+
+### Continuous Integration
+
+* improve workflow job names and labels ([d8edd57](https://github.com/exioReed/certbot-regfish-hooks/commit/d8edd573a949cbf9ca68bc73d18f212077fe2f7d))
+
 ## [2.0.0](https://github.com/exioReed/certbot-regfish-hooks/compare/certbot-regfish-hooks-v2.0.0...certbot-regfish-hooks-v2.0.0) (2025-01-12)
 
 
