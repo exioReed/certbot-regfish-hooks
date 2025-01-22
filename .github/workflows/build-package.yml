@@ -4,12 +4,20 @@ on:
     inputs:
       python-version:
         description: "Python version to use to build package. Supports SemVer as described in actions/setup-python." # https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#using-the-python-version-input
-        required: true
+        required: false
+        default: "3.13"
+        type: string
+      ref:
+        description: "The branch, tag or SHA to checkout."
+        required: false
         type: string
     outputs:
       artifact-name:
-        description: "Artifact Name"
+        description: "The name of the built package artifact."
         value: "${{ jobs.build-package.outputs.artifact-name }}"
+      python-version:
+        description: "The Python version used to build the package."
+        value: "${{ inputs.python-version }}"
 
 jobs:
   build-package:
@@ -18,7 +26,8 @@ jobs:
       - name: "Checkout repository"
         uses: "actions/checkout@v4"
         with:
-          fetch-depth: 0
+          fetch-tags: true
+          ref: ${{ inputs.ref }}
 
       - name: "Setup Python ${{ inputs.python-version }}"
         uses: "actions/setup-python@v5"

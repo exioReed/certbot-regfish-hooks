@@ -1,0 +1,24 @@
+name: "Validate Pull Request"
+run-name: "Validate PR #${{ github.event.pull_request.number }} on ${{ github.event.pull_request.head.ref }}"
+
+on:
+  pull_request:
+    types:
+      - labeled
+      - opened
+      - reopened
+      - synchronize
+
+jobs:
+  run-pre-commit-hooks:
+    uses: "./.github/workflows/pre-commit-hooks.yml"
+  build-package:
+    uses: "./.github/workflows/build-package.yml"
+  integration-test:
+    if: "${{ github.event.pull_request.labels.*.name == 'autorelease: pending' }}"
+    needs: build-package
+    uses: "./.github/workflows/integration-test.yml"
+    with:
+      artifact-name: "${{ needs.build-package.outputs.artifact-name }}"
+      python-version: "${{ needs.build-package.outputs.python-version }}"
+    secrets: inherit

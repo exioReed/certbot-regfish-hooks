@@ -4,10 +4,31 @@ GitHub Actions workflows for the `certbot-regfish-hooks` repository.
 
 Primary workflow(s):
 
-- [`integration-test.yml`](/.github/workflows/integration-test.yml)
-- [`pre-commit-hooks.yml`](/.github/workflows/pre-commit-hooks.yml)
 - [`release-please.yml`](/.github/workflows/release-please.yml)
+- [`validate-pull-request.yml`](/.github/workflows/validate-pull-request.yml)
 - _(more to come)_
+
+## Overview
+
+![Workflow Overview](/assets/workflow-overview.png)
+
+The workflow diagram outlines two main automation paths:
+
+1. Pull Request Validation:
+
+   - Triggered on PR creation, updates, and reopening
+   - Executes [pre-commit hooks](/.github/workflows/pre-commit-hooks.yml) and package
+     build checks
+   - If PR is labeled with `autorelease: pending`, runs
+     [integration tests](/.github/workflows/integration-test.yml) using Let's Encrypt
+     staging environment
+
+2. Release Automation:
+   - Managed by [release-please](/.github/workflows/release-please.yml) workflow
+   - Automatically creates release PRs on new commits to main
+   - On merge of release PR (labeled with `autorelease: pending`), creates GitHub
+     release and publishes package to
+     [PyPI](https://pypi.org/project/certbot-regfish-hooks/)
 
 ## Integration Test
 
