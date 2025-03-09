@@ -33,6 +33,8 @@ jobs:
     permissions:
       id-token: write
     steps:
+      - name: "Checkout repository"
+        uses: "actions/checkout@v4"
       - name: "Run pre-commit hooks"
         id: pre-commit-hooks
         uses: "./.github/workflows/pre-commit-hooks.yml"
